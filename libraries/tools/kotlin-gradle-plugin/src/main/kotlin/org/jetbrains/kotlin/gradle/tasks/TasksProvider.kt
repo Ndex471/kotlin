@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.gradle.plugin.sources.applyLanguageSettingsToKotlinT
  * Registers the task with [name] and [type] and initialization script [body]
  */
 @JvmName("registerTaskOld")
-@Deprecated("please use Project.createOrRegisterTask", ReplaceWith("project.registerTask(name, type, emptyList(), body)"))
+@Deprecated("please use Project.registerTask", ReplaceWith("project.registerTask(name, type, emptyList(), body)"))
 internal fun <T : Task> registerTask(project: Project, name: String, type: Class<T>, body: (T) -> (Unit)): TaskProvider<T> =
     project.registerTask(name, type, emptyList(), body)
 
@@ -78,7 +78,7 @@ internal open class KotlinTasksProvider(val targetName: String) {
     ): TaskProvider<out KotlinCompile> {
         val properties = PropertiesProvider(project)
         val taskClass = taskOrWorkersTask<KotlinCompile, KotlinCompileWithWorkers>(properties)
-        val result = project.registerTask<Any>(name, taskClass, emptyList()) {
+        val result = registerTask(project, name, taskClass) {
             configureAction(it)
         }
         configure(result, project, properties, compilation)
