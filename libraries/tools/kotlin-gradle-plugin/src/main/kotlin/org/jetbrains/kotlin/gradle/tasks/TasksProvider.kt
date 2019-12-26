@@ -20,15 +20,17 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.UnknownTaskException
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider
+import org.jetbrains.kotlin.gradle.plugin.mapKotlinTaskProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.runOnceAfterEvaluated
 import org.jetbrains.kotlin.gradle.plugin.sources.applyLanguageSettingsToKotlinTask
 
 /**
  * Registers the task with [name] and [type] and initialization script [body]
  */
 @JvmName("registerTaskOld")
-@Deprecated("please use Project.createOrRegisterTask", ReplaceWith("project.createOrRegisterTask(name, body)"))
+@Deprecated("please use Project.createOrRegisterTask", ReplaceWith("project.registerTask(name, type, emptyList(), body)"))
 internal fun <T : Task> registerTask(project: Project, name: String, type: Class<T>, body: (T) -> (Unit)): TaskProvider<T> =
     project.registerTask(name, type, emptyList(), body)
 
@@ -64,7 +66,7 @@ internal inline fun <reified T : Task> Project.locateTask(name: String): TaskPro
  * with [name], type [T] and initialization script [body]
  */
 internal inline fun <reified T : Task> Project.locateOrRegisterTask(name: String, noinline body: (T) -> (Unit)): TaskProvider<T> {
-    return project.locateTask(name) ?: registerTask(project, name, T::class.java, body)
+    return project.locateTask(name) ?: project.registerTask(name, T::class.java, emptyList(), body)
 }
 
 internal open class KotlinTasksProvider(val targetName: String) {
@@ -76,7 +78,7 @@ internal open class KotlinTasksProvider(val targetName: String) {
     ): TaskProvider<out KotlinCompile> {
         val properties = PropertiesProvider(project)
         val taskClass = taskOrWorkersTask<KotlinCompile, KotlinCompileWithWorkers>(properties)
-        val result = registerTask(project, name, taskClass) {
+        val result = project.registerTask<Any>(name, taskClass, emptyList()) {
             configureAction(it)
         }
         configure(result, project, properties, compilation)
