@@ -354,8 +354,8 @@ internal class KotlinJsIrSourceSetProcessor(
         val compilation = kotlinCompilation as KotlinJsIrCompilation
 
         listOf(
-            compilation.productionCompileTaskName,
-            compilation.developmentCompileTaskName
+            compilation.productionLinkTaskName,
+            compilation.developmentLinkTaskName
         ).map { taskName ->
             registerKotlinCompileTask(
                 taskName
