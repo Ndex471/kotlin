@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.ir.backend.js
 
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
+import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 import org.jetbrains.kotlin.backend.common.phaser.invokeToplevel
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.backend.js.export.isExported
@@ -15,10 +16,7 @@ import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransf
 import org.jetbrains.kotlin.ir.backend.js.utils.JsMainFunctionDetector
 import org.jetbrains.kotlin.ir.backend.js.utils.NameTables
 import org.jetbrains.kotlin.ir.backend.js.utils.isJsExport
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
-import org.jetbrains.kotlin.ir.declarations.IrField
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.ir.util.generateTypicalIrProviderList
@@ -57,6 +55,8 @@ fun compile(
     generateFullJs: Boolean = true,
     generateDceJs: Boolean = false
 ): CompilerResult {
+    stageController = object : StageController {}
+
     val (moduleFragment: IrModuleFragment, dependencyModules, irBuiltIns, symbolTable, deserializer) =
         loadIr(project, mainModule, configuration, allDependencies, friendDependencies)
 
@@ -91,7 +91,14 @@ fun compile(
 
     moveBodilessDeclarationsToSeparatePlace(context, moduleFragment)
 
-    jsPhases.invokeToplevel(phaseConfig, context, moduleFragment)
+    val controller = MutableController()
+    stageController = controller
+
+    val phaserState = PhaserState<IrModuleFragment>()
+    phaseList.forEachIndexed { index, phase ->
+        controller.currentStage = index + 1
+        phase.invoke(phaseConfig, phaserState, context, moduleFragment)
+    }
 
     val transformer = IrModuleToJsTransformer(context, mainFunction, mainArguments)
     return transformer.generateModule(moduleFragment, generateFullJs, generateDceJs)
