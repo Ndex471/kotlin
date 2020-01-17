@@ -25,8 +25,6 @@ interface StageController {
 
     fun <T> withInitialIr(block: () -> T): T = block()
 
-    fun <T> withInitialStateOf(declaration: IrDeclaration, block: () -> T): T = block()
-
     fun <T> restrictTo(declaration: IrDeclaration, fn: () -> T): T = fn()
 
     fun <T> bodyLowering(fn: () -> T): T = fn()

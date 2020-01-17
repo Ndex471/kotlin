@@ -46,13 +46,14 @@ class IrModuleToJsTransformer(
         val exportedModule = ExportModelGenerator(backendContext).generateExport(module)
         val dts = exportedModule.toTypeScript()
 
-        module.files.forEach { StaticMembersLowering(backendContext).lower(it) }
+//        module.files.forEach { StaticMembersLowering(backendContext).lower(it) }
 
         namer.merge(module.files, additionalPackages)
 
         val jsCode = if (fullJs) generateWrappedModuleBody(module, exportedModule) else null
 
         val dceJsCode = if (dceJs) {
+            error("Disable DCE for now")
             eliminateDeadDeclarations(module, backendContext, mainFunction)
             generateWrappedModuleBody(module, exportedModule)
         } else null

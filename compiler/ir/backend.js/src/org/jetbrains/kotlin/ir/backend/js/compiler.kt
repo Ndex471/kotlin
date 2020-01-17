@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.common.phaser.PhaserState
 import org.jetbrains.kotlin.backend.common.phaser.invokeToplevel
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.ir.backend.js.export.isExported
+import org.jetbrains.kotlin.ir.backend.js.lower.generateTests
 import org.jetbrains.kotlin.ir.backend.js.lower.moveBodilessDeclarationsToSeparatePlace
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransformer
 import org.jetbrains.kotlin.ir.backend.js.utils.JsMainFunctionDetector
@@ -26,16 +26,6 @@ import org.jetbrains.kotlin.library.KotlinLibrary
 import org.jetbrains.kotlin.library.resolver.KotlinLibraryResolveResult
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.utils.DFS
-
-fun sortDependencies(dependencies: Collection<IrModuleFragment>): Collection<IrModuleFragment> {
-    val mapping = dependencies.map { it.descriptor to it }.toMap()
-
-    return DFS.topologicalOrder(dependencies) { m ->
-        val descriptor = m.descriptor
-        descriptor.allDependencyModules.filter { it != descriptor }.map { mapping[it] }
-    }.reversed()
-}
 
 class CompilerResult(
     val jsCode: String?,
@@ -90,14 +80,26 @@ fun compile(
     deserializer.finalizeExpectActualLinker()
 
     moveBodilessDeclarationsToSeparatePlace(context, moduleFragment)
+    // TODO we should only generate tests for the current module
+    generateTests(context, moduleFragment)
 
-    val controller = MutableController()
+    val controller = MutableController(context)
     stageController = controller
 
-    val phaserState = PhaserState<IrModuleFragment>()
-    phaseList.forEachIndexed { index, phase ->
-        controller.currentStage = index + 1
-        phase.invoke(phaseConfig, phaserState, context, moduleFragment)
+//    val phaserState = PhaserState<IrModuleFragment>()
+//    loweringList.forEachIndexed { index, lowering ->
+//        controller.currentStage = index + 1
+//        lowering.modulePhase.invoke(phaseConfig, phaserState, context, moduleFragment)
+//    }
+
+//    jsPhases.invokeToplevel(phaseConfig, context, moduleFragment)
+
+    controller.currentStage = loweringList.size + 1
+
+    eliminateDeadDeclarations(moduleFragment, context, mainFunction)
+
+    stageController = object : StageController {
+        override val currentStage: Int = controller.currentStage
     }
 
     val transformer = IrModuleToJsTransformer(context, mainFunction, mainArguments)
