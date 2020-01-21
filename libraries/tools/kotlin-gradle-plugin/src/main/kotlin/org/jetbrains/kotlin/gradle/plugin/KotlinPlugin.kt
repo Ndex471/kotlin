@@ -5,7 +5,6 @@ import com.android.build.gradle.BasePlugin
 import com.android.build.gradle.api.AndroidSourceSet
 import com.android.build.gradle.api.BaseVariant
 import com.android.builder.model.SourceProvider
-import groovy.lang.Closure
 import org.gradle.api.*
 import org.gradle.api.artifacts.ExternalDependency
 import org.gradle.api.artifacts.MutableVersionConstraint
@@ -22,7 +21,10 @@ import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.MavenPluginConvention
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.CompileClasspathNormalizer
+import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.jvm.tasks.Jar
@@ -286,8 +288,6 @@ internal class Kotlin2JsSourceSetProcessor(
             it.dependsOn(kotlinTask)
         }
 
-        registerCleanSourceMapTask()
-
         if (kotlinCompilation is KotlinWithJavaCompilation<*>) {
             kotlinCompilation.javaSourceSet.clearJavaSrcDirs()
         }
@@ -317,17 +317,6 @@ internal class Kotlin2JsSourceSetProcessor(
                 .flatMap { it.getSubpluginKotlinTasks(project, kotlinTaskInstance) }
                 .forEach { task -> kotlinCompilation.allKotlinSourceSets.forEach { sourceSet -> task.source(sourceSet.kotlin) } }
         }
-    }
-
-    private fun registerCleanSourceMapTask() {
-        val taskName = kotlinCompilation.composeName("clean", "sourceMap")
-        project.registerTask<Delete>(taskName) {
-            it.onlyIf { kotlinTask.get().kotlinOptions.sourceMap }
-            it.delete(object : Closure<String>(this) {
-                override fun call(): String? = (kotlinTask.get().property("outputFile") as File).canonicalPath + ".map"
-            })
-        }
-        project.tasks.findByName("clean")?.dependsOn(taskName)
     }
 }
 
@@ -390,8 +379,6 @@ internal class KotlinJsIrSourceSetProcessor(
             it.dependsOn(kotlinTask)
         }
 
-        registerCleanSourceMapTask()
-
         val compilation = kotlinCompilation as KotlinJsIrCompilation
 
         listOf(
@@ -432,17 +419,6 @@ internal class KotlinJsIrSourceSetProcessor(
                 .flatMap { it.getSubpluginKotlinTasks(project, kotlinTaskInstance) }
                 .forEach { task -> kotlinCompilation.allKotlinSourceSets.forEach { sourceSet -> task.source(sourceSet.kotlin) } }
         }
-    }
-
-    private fun registerCleanSourceMapTask() {
-        val taskName = kotlinCompilation.composeName("clean", "sourceMap")
-        project.registerTask<Delete>(taskName) {
-            it.onlyIf { kotlinTask.get().kotlinOptions.sourceMap }
-            it.delete(object : Closure<String>(this) {
-                override fun call(): String? = (kotlinTask.get().property("outputFile") as File).canonicalPath + ".map"
-            })
-        }
-        project.tasks.findByName("clean")?.dependsOn(taskName)
     }
 }
 
