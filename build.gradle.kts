@@ -8,7 +8,12 @@ buildscript {
     extra["defaultSnapshotVersion"] = "1.4-SNAPSHOT"
     val cacheRedirectorEnabled = findProperty("cacheRedirectorEnabled")?.toString()?.toBoolean() == true
 
-    kotlinBootstrapFrom(BootstrapOption.BintrayBootstrap("1.4.0-dev-1075", cacheRedirectorEnabled))
+    kotlinBootstrapFrom(BootstrapOption.TeamCity(
+        "1.4.0-dev-1570",
+        projectExtId = "Kotlin_KotlinDev_Compiler",
+        onlySuccessBootstrap = false,
+        teamcityUrl = "https://buildserver.labs.intellij.net/"
+    ))
 
     repositories {
         bootstrapKotlinRepo?.let(::maven)
