@@ -9,5 +9,6 @@ val B?.name: String?
     get() = ""
 
 fun test(b: B) {
+    // NB: in old FE, we also have ambiguity here
     val id = b.<!AMBIGUITY!>name<!>
 }
