@@ -426,6 +426,7 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
 
     private fun HashMap<LanguageFeature, LanguageFeature.State>.configureLanguageFeaturesFromInternalArgs(collector: MessageCollector) {
         val featuresThatForcePreReleaseBinaries = mutableListOf<LanguageFeature>()
+        val disabledFeaturesFromUnsupportedVersions = mutableListOf<LanguageFeature>()
 
         var standaloneSamConversionFeaturePassedExplicitly = false
         var functionReferenceWithDefaultValueFeaturePassedExplicitly = false
@@ -433,6 +434,10 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
             put(feature, state)
             if (state == LanguageFeature.State.ENABLED && feature.forcesPreReleaseBinariesIfEnabled()) {
                 featuresThatForcePreReleaseBinaries += feature
+            }
+
+            if (state == LanguageFeature.State.DISABLED && feature.sinceVersion?.isUnsupported == true) {
+                disabledFeaturesFromUnsupportedVersions += feature
             }
 
             when (feature) {
@@ -458,6 +463,14 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
             collector.report(
                 CompilerMessageSeverity.STRONG_WARNING,
                 "Following manually enabled features will force generation of pre-release binaries: ${featuresThatForcePreReleaseBinaries.joinToString()}"
+            )
+        }
+
+        if (disabledFeaturesFromUnsupportedVersions.isNotEmpty()) {
+            collector.report(
+                CompilerMessageSeverity.ERROR,
+                "The following features cannot be disabled manually, because the version they first appeared in is no longer " +
+                        "supported:\n${disabledFeaturesFromUnsupportedVersions.joinToString()}"
             )
         }
     }

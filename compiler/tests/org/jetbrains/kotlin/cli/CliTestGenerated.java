@@ -180,9 +180,9 @@ public class CliTestGenerated extends AbstractCliTest {
             runTest("compiler/testData/cli/jvm/diagnosticsOrder.args");
         }
 
-        @TestMetadata("disabledFeatureInUsupportedVersion.args")
-        public void testDisabledFeatureInUsupportedVersion() throws Exception {
-            runTest("compiler/testData/cli/jvm/disabledFeatureInUsupportedVersion.args");
+        @TestMetadata("disabledFeatureFromUnsupportedVersion.args")
+        public void testDisabledFeatureFromUnsupportedVersion() throws Exception {
+            runTest("compiler/testData/cli/jvm/disabledFeatureFromUnsupportedVersion.args");
         }
 
         @TestMetadata("duplicateSources.args")
