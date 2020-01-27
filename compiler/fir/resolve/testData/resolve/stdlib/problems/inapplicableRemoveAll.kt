@@ -1,5 +1,9 @@
-fun test(list: MutableList<String>) {
-    list.<!AMBIGUITY!>removeAll<!> {
-        <!UNRESOLVED_REFERENCE!>it<!>.<!AMBIGUITY!>isEmpty<!>()
+fun foo(f: () -> Any) {}
+
+fun foo(f: (String) -> Boolean) {}
+
+fun test() {
+    foo {
+        it.isEmpty()
     }
 }
