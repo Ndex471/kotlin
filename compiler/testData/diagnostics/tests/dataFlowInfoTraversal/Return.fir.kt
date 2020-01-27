@@ -5,7 +5,7 @@ fun bar(x: Int): Int = x + 1
 fun foo(): Int {
     val x: Int? = null
 
-    <!INAPPLICABLE_CANDIDATE!>bar<!>(x)
+    bar(x)
     if (x != null) return x
     
     val y: Int? = null

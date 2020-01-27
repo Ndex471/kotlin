@@ -4,14 +4,14 @@ class A(val i: Int?) {
     fun test1() {
         if (this@A.i != null) {
             useInt(this.i)
-            <!INAPPLICABLE_CANDIDATE!>useInt<!>(i)
+            useInt(i)
         }
     }
 
     inner class B {
         fun test2() {
             if (i != null) {
-                <!INAPPLICABLE_CANDIDATE!>useInt<!>(this@A.i)
+                useInt(this@A.i)
             }
         }
     }
@@ -20,14 +20,14 @@ class A(val i: Int?) {
 fun A.foo() {
     if (this@foo.i != null) {
         useInt(this.i)
-        <!INAPPLICABLE_CANDIDATE!>useInt<!>(i)
+        useInt(i)
     }
 }
 
 fun test3() {
     useFunction {
         if(i != null) {
-            <!INAPPLICABLE_CANDIDATE!>useInt<!>(this.i)
+            useInt(this.i)
         }
     }
 }

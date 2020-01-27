@@ -6,16 +6,16 @@ class Test {
 
     fun bar(a: Test, b: Test) {
         if (a.foo != null) {
-            <!INAPPLICABLE_CANDIDATE!>useInt<!>(b.foo)
+            useInt(b.foo)
         }
         if (a.foo != null) {
-            <!INAPPLICABLE_CANDIDATE!>useInt<!>(foo)
+            useInt(foo)
         }
         if (this.foo != null) {
-            <!INAPPLICABLE_CANDIDATE!>useInt<!>(foo)
+            useInt(foo)
         }
         if (foo != null) {
-            <!INAPPLICABLE_CANDIDATE!>useInt<!>(this.foo)
+            useInt(this.foo)
         }
     }
 

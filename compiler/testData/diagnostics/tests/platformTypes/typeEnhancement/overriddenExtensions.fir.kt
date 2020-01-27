@@ -10,7 +10,7 @@ class E : B1() {
 
         x.<!INAPPLICABLE_CANDIDATE!>foo<!>(x)
         x.<!INAPPLICABLE_CANDIDATE!>foo<!>("")
-        x.<!INAPPLICABLE_CANDIDATE!>bar<!>(x)
+        x.bar(x)
         x.bar("")
     }
 

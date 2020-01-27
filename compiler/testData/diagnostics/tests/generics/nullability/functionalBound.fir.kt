@@ -5,7 +5,7 @@ fun <E : String?, T : ((CharSequence) -> Unit)?> foo(x: E, y: T) {
     }
 
     if (y != null) {
-        <!INAPPLICABLE_CANDIDATE!>y<!>(x)
+        y(x)
     }
 
     if (x != null && y != null) {

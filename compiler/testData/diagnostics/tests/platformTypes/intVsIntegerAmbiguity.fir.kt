@@ -27,9 +27,9 @@ fun test(i: Int, ni: Int?) {
     checkSubtype<C>(foo(2))
     <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><J.A>(J.<!AMBIGUITY!>foo<!>(2))
     <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><J.A>(J.<!AMBIGUITY!>foo<!>(i))
-    checkSubtype<J.B>(J.foo(ni))
+    <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><J.B>(J.<!AMBIGUITY!>foo<!>(ni))
     checkSubtype<C>(foo(ni))
-    checkSubtype<J.B>(J.foo(ni))
+    <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><J.B>(J.<!AMBIGUITY!>foo<!>(ni))
 
     foo(J.getInteger())
     J.<!AMBIGUITY!>foo<!>(J.getInteger())

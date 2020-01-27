@@ -7,7 +7,7 @@ fun foo(x: Int): Int = x + 1
 fun main() {
     val x: Int? = null
 
-    <!INAPPLICABLE_CANDIDATE!>foo<!>(x)
+    foo(x)
 
     if (x != null) {
         foo(x)
@@ -15,14 +15,14 @@ fun main() {
         foo(x)
     }
 
-    <!INAPPLICABLE_CANDIDATE!>foo<!>(x)
+    foo(x)
 
     if (x != null) {
         foo(x)
         foo(x!!)
         foo(x)
     } else {
-        <!INAPPLICABLE_CANDIDATE!>foo<!>(x)
+        foo(x)
         foo(x!!)
         foo(x)
     }

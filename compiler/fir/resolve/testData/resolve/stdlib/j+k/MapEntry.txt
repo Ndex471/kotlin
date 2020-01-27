@@ -9,5 +9,5 @@ FILE: main.kt
         lval b: R|MyMapEntry| = R|/MyMapEntry.MyMapEntry|()
         R|<local>/b|.R|/Test.MapEntryImpl.key|
         R|<local>/b|.R|/Test.MapEntryImpl.value|
-        R|<local>/b|.<Inapplicable(INAPPLICABLE): [/Test.MapEntryImpl.setValue]>#(Null(null))
+        R|<local>/b|.R|/Test.MapEntryImpl.setValue|(Null(null))
     }

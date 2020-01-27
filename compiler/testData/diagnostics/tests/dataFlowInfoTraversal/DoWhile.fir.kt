@@ -4,13 +4,13 @@ fun foo() {
     val x: Int? = null
 
     do {
-        <!INAPPLICABLE_CANDIDATE!>bar<!>(x)
+        bar(x)
     } while (x == null)
-    <!INAPPLICABLE_CANDIDATE!>bar<!>(x)
+    bar(x)
     
     val y: Int? = null
     do {
-        <!INAPPLICABLE_CANDIDATE!>bar<!>(y)
+        bar(y)
     } while (y != null)
-    <!INAPPLICABLE_CANDIDATE!>bar<!>(y)
+    bar(y)
 }
