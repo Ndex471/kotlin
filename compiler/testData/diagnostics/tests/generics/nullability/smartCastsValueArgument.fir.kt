@@ -45,8 +45,8 @@ fun <T : CharSequence?> foo(x: T) {
         bar2(x)
         <!INAPPLICABLE_CANDIDATE!>bar3<!>(x)
 
-        <!INAPPLICABLE_CANDIDATE!>bar1<!>(y)
-        <!INAPPLICABLE_CANDIDATE!>bar2<!>(y)
+        bar1(y)
+        bar2(y)
         <!INAPPLICABLE_CANDIDATE!>bar3<!>(y)
     }
 }
