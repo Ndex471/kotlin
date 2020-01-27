@@ -88,7 +88,7 @@ internal abstract class KotlinSourceSetProcessor<T : AbstractKotlinCompile<*>>(
 
     protected val sourceSetName: String = kotlinCompilation.compilationName
 
-    override val kotlinTask: TaskProvider<out T> = prepareKotlinCompileTask(kotlinCompilation.compileKotlinTaskName)
+    override val kotlinTask: TaskProvider<out T> = prepareKotlinCompileTask()
 
     protected val javaSourceSet: SourceSet?
         get() =
@@ -99,8 +99,8 @@ internal abstract class KotlinSourceSetProcessor<T : AbstractKotlinCompile<*>>(
                     else null
                 }
 
-    private fun prepareKotlinCompileTask(name: String): TaskProvider<out T> =
-        registerKotlinCompileTask(name).also { task ->
+    private fun prepareKotlinCompileTask(): TaskProvider<out T> =
+        registerKotlinCompileTask().also { task ->
             kotlinCompilation.output.addClassesDir { project.files(task.map { it.destinationDir }) }
         }
 
