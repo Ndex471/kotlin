@@ -1,3 +1,4 @@
+warning: language version 1.2 is deprecated and its support will be removed in a future version of Kotlin
 compiler/testData/cli/jvm/progressive/dataClassOverridingCopy.kt:5:1: warning: function 'copy' generated for the data class has default values for parameters, and conflicts with member of supertype 'WithCopy'
 data class Test(val str: String): WithCopy<String>
 ^

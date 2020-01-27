@@ -471,32 +471,77 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
         // (API version cannot be greater than the language version)
         val apiVersion = parseVersion(collector, apiVersion, "API") ?: languageVersion
 
+        checkApiVersionIsNotGreaterThenLanguageVersion(languageVersion, apiVersion, collector)
+        checkLanguageVersionIsStable(languageVersion, collector)
+        checkOutdatedVersions(languageVersion, apiVersion, collector)
+        checkProgressiveMode(languageVersion, collector)
+
+        val languageVersionSettings = LanguageVersionSettingsImpl(
+            languageVersion,
+            ApiVersion.createByLanguageVersion(apiVersion),
+            configureAnalysisFlags(collector),
+            configureLanguageFeatures(collector)
+        )
+
+        checkCoroutines(languageVersionSettings, collector)
+
+        return languageVersionSettings
+    }
+
+    private fun checkApiVersionIsNotGreaterThenLanguageVersion(
+        languageVersion: LanguageVersion,
+        apiVersion: LanguageVersion,
+        collector: MessageCollector
+    ) {
         if (apiVersion > languageVersion) {
             collector.report(
                 CompilerMessageSeverity.ERROR,
                 "-api-version (${apiVersion.versionString}) cannot be greater than -language-version (${languageVersion.versionString})"
             )
         }
+    }
 
+    private fun checkLanguageVersionIsStable(languageVersion: LanguageVersion, collector: MessageCollector) {
         if (!languageVersion.isStable) {
             collector.report(
                 CompilerMessageSeverity.STRONG_WARNING,
-                "Language version ${languageVersion.versionString} is experimental, there are no backwards compatibility guarantees for new language and library features"
+                "Language version ${languageVersion.versionString} is experimental, there are no backwards compatibility guarantees for " +
+                        "new language and library features"
             )
         }
+    }
 
-        val deprecatedVersion = when {
-            languageVersion < LanguageVersion.FIRST_SUPPORTED -> "Language version ${languageVersion.versionString}"
-            apiVersion < LanguageVersion.FIRST_SUPPORTED -> "API version ${apiVersion.versionString}"
+    private fun checkOutdatedVersions(language: LanguageVersion, api: LanguageVersion, collector: MessageCollector) {
+        val (version, versionKind) = findOutdatedVersion(language, api) ?: return
+        when {
+            version.isUnsupported -> {
+                collector.report(
+                    CompilerMessageSeverity.ERROR,
+                    "${versionKind.text} version ${version.versionString} is no longer supported; " +
+                            "please, use version ${LanguageVersion.OLDEST_DEPRECATED.versionString} or greater."
+                )
+            }
+            version.isDeprecated -> {
+                collector.report(
+                    CompilerMessageSeverity.STRONG_WARNING,
+                    "${versionKind.text} version ${version.versionString} is deprecated " +
+                            "and its support will be removed in a future version of Kotlin"
+                )
+            }
+        }
+    }
+
+    private fun findOutdatedVersion(language: LanguageVersion, api: LanguageVersion): Pair<LanguageVersion, VersionKind>? {
+        return when {
+            language.isUnsupported -> language to VersionKind.LANGUAGE
+            api.isUnsupported -> api to VersionKind.API
+            language.isDeprecated -> language to VersionKind.LANGUAGE
+            api.isDeprecated -> api to VersionKind.API
             else -> null
         }
-        if (deprecatedVersion != null) {
-            collector.report(
-                CompilerMessageSeverity.STRONG_WARNING,
-                "$deprecatedVersion is deprecated and its support will be removed in a future version of Kotlin"
-            )
-        }
+    }
 
+    private fun checkProgressiveMode(languageVersion: LanguageVersion, collector: MessageCollector) {
         if (progressiveMode && languageVersion < LanguageVersion.LATEST_STABLE) {
             collector.report(
                 CompilerMessageSeverity.STRONG_WARNING,
@@ -506,14 +551,9 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
                         "or turning off progressive mode."
             )
         }
+    }
 
-        val languageVersionSettings = LanguageVersionSettingsImpl(
-            languageVersion,
-            ApiVersion.createByLanguageVersion(apiVersion),
-            configureAnalysisFlags(collector),
-            configureLanguageFeatures(collector)
-        )
-
+    private fun checkCoroutines(languageVersionSettings: LanguageVersionSettings, collector: MessageCollector) {
         if (languageVersionSettings.supportsFeature(LanguageFeature.ReleaseCoroutines)) {
             if (coroutinesState != DEFAULT) {
                 collector.report(
@@ -522,19 +562,21 @@ abstract class CommonCompilerArguments : CommonToolArguments() {
                 )
             }
         }
+    }
 
-        return languageVersionSettings
+    private enum class VersionKind(val text: String) {
+        LANGUAGE("Language"), API("API")
     }
 
     private fun parseVersion(collector: MessageCollector, value: String?, versionOf: String): LanguageVersion? =
         if (value == null) null
         else LanguageVersion.fromVersionString(value)
-                ?: run {
-                    val versionStrings = LanguageVersion.values().map(LanguageVersion::description)
-                    val message = "Unknown $versionOf version: $value\nSupported $versionOf versions: ${versionStrings.joinToString(", ")}"
-                    collector.report(CompilerMessageSeverity.ERROR, message, null)
-                    null
-                }
+            ?: run {
+                val versionStrings = LanguageVersion.values().map(LanguageVersion::description)
+                val message = "Unknown $versionOf version: $value\nSupported $versionOf versions: ${versionStrings.joinToString(", ")}"
+                collector.report(CompilerMessageSeverity.ERROR, message, null)
+                null
+            }
 
     // Used only for serialize and deserialize settings. Don't use in other places!
     class DummyImpl : CommonCompilerArguments()
