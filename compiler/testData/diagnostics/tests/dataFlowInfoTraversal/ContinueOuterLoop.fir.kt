@@ -5,9 +5,9 @@ fun whileLoop(x: Int?) {
         while (x != 1) {
             if (x == 2) continue@outer
         }
-        checkSubtype<Int>(x)
+        <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><Int>(x)
     }
-    checkSubtype<Int>(x)
+    <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><Int>(x)
 }
 
 fun doWhileLoop(x: Int?) {
@@ -15,9 +15,9 @@ fun doWhileLoop(x: Int?) {
         do {
             if (x == 2) continue@outer
         } while (x == null)
-        checkSubtype<Int>(x)
+        <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><Int>(x)
     }
-    checkSubtype<Int>(x)
+    <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><Int>(x)
 }
 
 fun whileLoopContinueInnerOuter(x: Int?) {
@@ -26,9 +26,9 @@ fun whileLoopContinueInnerOuter(x: Int?) {
             while (x != 2) {
                 if (x == 3) continue@inner
             }
-            checkSubtype<Int>(x)
+            <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><Int>(x)
         }
-        checkSubtype<Int>(x)
+        <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><Int>(x)
     }
-    checkSubtype<Int>(x)
+    <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><Int>(x)
 }

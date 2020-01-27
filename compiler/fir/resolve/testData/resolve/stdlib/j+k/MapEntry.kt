@@ -19,5 +19,5 @@ fun test() {
     val b = MyMapEntry()
     b.key
     b.value
-    b.setValue(null)
+    b.<!INAPPLICABLE_CANDIDATE!>setValue<!>(null)
 }

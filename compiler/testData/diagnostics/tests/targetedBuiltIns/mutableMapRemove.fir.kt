@@ -19,7 +19,7 @@ class KotlinMap2 : java.util.AbstractMap<String, Int>() {
 fun foo(x: MutableMap<String, Int>, y: java.util.HashMap<String, Int>, z: java.util.AbstractMap<String, Int>) {
     x.remove("", 1)
     x.<!INAPPLICABLE_CANDIDATE!>remove<!>("", "")
-    x.remove("", null)
+    x.<!INAPPLICABLE_CANDIDATE!>remove<!>("", null)
 
     y.remove("", 1)
     y.remove("", "")
@@ -27,5 +27,5 @@ fun foo(x: MutableMap<String, Int>, y: java.util.HashMap<String, Int>, z: java.u
 
     z.remove("", 1)
     z.<!INAPPLICABLE_CANDIDATE!>remove<!>("", "")
-    z.remove("", null)
+    z.<!INAPPLICABLE_CANDIDATE!>remove<!>("", null)
 }

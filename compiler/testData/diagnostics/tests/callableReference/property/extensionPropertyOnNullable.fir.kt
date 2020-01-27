@@ -5,6 +5,6 @@ val Any?.meaning: Int
 
 fun test() {
     val f = Any?::meaning
-    checkSubtype<Int>(f.get(null))
+    <!INAPPLICABLE_CANDIDATE!>checkSubtype<!><Int>(f.<!INAPPLICABLE_CANDIDATE!>get<!>(null))
     checkSubtype<Int>(f.get(""))
 }
